@@ -58,14 +58,19 @@ class MY_Model extends CI_Model {
         $result = $this->get_object($condition, $select)->num_rows();
         return $result;
     }
-    public function sum($tanggal, $id){
-        $this->db->select_sum('kalori');;
-        $this->db->from($this->table);
-        $this->db->where('tanggal',$tanggal);
-        $this->db->where('id_user',$id);
-        $query=$this->db->get();
-        $data['total']=$query->row()->kalori;
+    public function sum($select_sum, $condition = NULL){
+        $this->db->select_sum($select_sum);
+        $result = $this->get($condition);
+        return $result;
     }
+
+    public function sum_day($select_sum, $condition = NULL, $condition2 = NULL){
+        $this->db->select_sum($select_sum);
+        $result = $this->get($condition);
+        $result = $this->get($condition2);
+        return $result;
+    }
+
     public function rawQuery($query){
         $result = $this->db->query($query);
         return $result;

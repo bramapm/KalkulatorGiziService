@@ -7,6 +7,7 @@ class Record extends MY_Controller {
         parent::__construct();
         $this->load->model("Table_Record_olg", "recordOlg");
         $this->load->model("Table_Record_mkn", "recordMkn");
+        $this->load->model("Table_Makanan", "mkn");
     }
 
 	public function index()
@@ -40,12 +41,13 @@ class Record extends MY_Controller {
 	}
 
     public function insertOlg(){
+        $kal = $this->mkn->get($this->post('id_olahraga'), 'kkal');
         $data = array(
         	//'id_recordolg'		=> $this->post('id_recordolg'),
             'id_user'			=> $this->post('id_user'),
             'id_olahraga'		=> $this->post('id_olahraga'),                       
             'tanggal'			=> $this->post('tanggal'),
-            'kalori'			=> $this->post('kalori'),            
+            'kalori'			=> (is_object($kal[0])) ? $kal[0]->kkal : 0
         );
         $insert = $this->recordOlg->insert($data);
         if ($insert) {
@@ -56,27 +58,68 @@ class Record extends MY_Controller {
     }
 
     public function insertMkn(){
+        $kal = $this->mkn->get($this->post('id_makanan'), 'kkal');
         $data = array(
-        	//'id_recordolg'		=> $this->post('id_recordolg'),
+        	//'id_recordmkn'	=> $this->post('id_recordmkn'),
             'id_user'			=> $this->post('id_user'),
             'id_makanan'		=> $this->post('id_makanan'),
             'kat_waktu'			=> $this->post('kat_waktu'),
             'tanggal'			=> $this->post('tanggal'),
-            'kalori'			=> $this->post('kalori'),
+            'kalori'			=> (is_object($kal[0])) ? $kal[0]->kkal : 0
         );
         $insert = $this->recordMkn->insert($data);
         if ($insert) {
-        	$this->_api(JSON_SUCCESS, "Success Insert Data", $data);                        
+        	$this->_api(JSON_SUCCESS, "Success Insert Data", $data);
         } else {
             $this->_api(JSON_ERROR, "Insert Data Gagal");
       	}
     }
 
-    public function getCountKaloriMkn(){
-    	$id 	= $this->post('id_user');
-    	$query = "SELECT SUM(kalori) FROM `record_olg` WHERE id_user=0";
-    	$res = $query->result();
-    	return $res;
+    public function countKaloriMkn(){
+        // 'kat_waktu' => $this->post('kat_waktu'),
+        $kal = array(0,0,0,0);
+        for ($i=0; $i < 4; $i++) { 
+            $waktu = "pagi";
+            switch ($i) {
+                case 1:
+                    $waktu = "siang";
+                    break;
+                case 2:
+                    $waktu = "malam";
+                    break;
+                case 3:
+                    $waktu = "lain";
+                    break;
+                default:
+                    $waktu = "pagi";
+                    break;
+            }
+            $query  = $this->recordMkn->sum('kalori', array(
+                'id_user' => $this->post('id_user'),
+                'tanggal' => $this->post('tanggal'),
+                'kat_waktu' => $waktu,
+            ));
+            if (isset($query[0])) {
+                if (is_null($query[0]->kalori)) {
+                    $kal[$i] = 0;
+                }else{
+                    $kal[$i] = $query[0]->kalori;
+                }
+            }
+        }
+        $this->_api(JSON_SUCCESS, "Success Count Data", $kal);
+    }
+
+    public function countKaloriMknPagi(){
+        $query  = $this->recordMkn->sum('kalori', array(
+            'id_user' => $this->post('id_user'),
+            'tanggal' => $this->post('tanggal'),                        
+            ));
+        if ($query) {
+            $this->_api(JSON_SUCCESS, "Success Count Data", $query);
+        } else {
+            $this->_api(JSON_ERROR, "Failed Count Data");
+        }
     }
 
     public function update(){
