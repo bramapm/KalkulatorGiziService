@@ -110,7 +110,7 @@ class Record extends MY_Controller {
         $this->_api(JSON_SUCCESS, "Success Count Data", $kal);
     }
 
-    public function countKaloriMknPagi(){
+    public function countKaloriMknTotal(){
         $query  = $this->recordMkn->sum('kalori', array(
             'id_user' => $this->post('id_user'),
             'tanggal' => $this->post('tanggal'),                        
