@@ -146,18 +146,20 @@ class Record extends MY_Controller {
         }
     }
 
-    public function update(){
-        
+    public function update(){        
     }
 
     public function saran(){
-        //$data =   $this->post('');
-        // $kal = 500;
-        // $num = "<= ".$kal;
-        // $con = array('kkal'     => $num);
-        // $data = $this->olg->get()->where('kkal', array());
-        
-        // $this->_api(JSON_SUCCESS, "Success Get Data", $data);
+        $key = $this->post('key');
+        if ($key=="lebih") {
+            $kal = $this->post('kal');
+            $data = $this->olg->saran($kal, $this->olg->table);
+            $this->_api(JSON_SUCCESS, "Success Get Data", $data);
+        } else {
+            $kal = $this->post('kal');
+            $data = $this->mkn->saran($kal, $this->mkn->table);
+            $this->_api(JSON_SUCCESS, "Success Get Data", $data);    
+        }
     }
 
     public function delete(){

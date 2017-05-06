@@ -71,6 +71,12 @@ class MY_Model extends CI_Model {
         return $result;
     }
 
+    public function saran($kal = NULL, $table = NULL){        
+        $this->db->where("kkal <", $kal);
+        $result = $this->db->get($table);
+        return $result->result();
+    }
+
     public function rawQuery($query){
         $result = $this->db->query($query);
         return $result;
