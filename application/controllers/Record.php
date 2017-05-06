@@ -8,6 +8,7 @@ class Record extends MY_Controller {
         $this->load->model("Table_Record_olg", "recordOlg");
         $this->load->model("Table_Record_mkn", "recordMkn");
         $this->load->model("Table_Makanan", "mkn");
+        $this->load->model("Table_Olahraga", "olg");
     }
 
 	public function index()
@@ -32,13 +33,36 @@ class Record extends MY_Controller {
         foreach ($olahraga as $key) {
             $res[] = array( 
             	"id_recordolg"      => $key->id_recordolg,
-                "id_olahraga"       => $key->id_olahraga,                
+                "id_olahraga"       => $key->id_olahraga,
+                "id_user"           => $key->id_user,
                 "tanggal"	  		=> $key->tanggal,
                 "kalori"			=> $key->kalori,               
             );
         }
         $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
 	}
+
+    public function get_recordMkn()
+    {
+        $recordCode =   $this->post('id_recordmkn');
+        if ($recordCode != "") {
+            $olahraga = $this->recordMkn->get($recordCode);
+        }else{
+            $olahraga = $this->recordMkn->get();
+        }
+        $res = array();
+        foreach ($olahraga as $key) {
+            $res[] = array( 
+                "id_recordmkn"      => $key->id_recordmkn,
+                "id_makanan"        => $key->id_makanan,
+                "id_user"           => $key->id_user,
+                "tanggal"           => $key->tanggal,
+                "kat_waktu"         => $key->kat_waktu,
+                "kalori"            => $key->kalori,               
+            );
+        }
+        $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
+    }
 
     public function insertOlg(){
         $kal = $this->mkn->get($this->post('id_olahraga'), 'kkal');
@@ -123,67 +147,20 @@ class Record extends MY_Controller {
     }
 
     public function update(){
-        $nm = $this->post('nama_olahraga');
+        
+    }
 
-        $lokasi   = './assets/upload/Olahraga/';
-
-        $nama = $this->olg->get($this->post("id_olahraga"));
-        $flold = "";
-        if(isset($nama[0])){
-            $flold = $lokasi.$nama[0]->nama_olahraga.'.png';
-        }
-        $flnew = $lokasi.$nm.'.png';
-
-        $data = array(            
-            'nama_olahraga'     => $this->post('nama_olahraga'),
-            'kkal'              => $this->post('kkal'),
-            'keterangan'        => $this->post('keterangan'),          
-        );
-
-        $update = $this->olg->update($data, $this->post("id_olahraga"));
-        if ($update) {
-            if(file_exists($flold) && !empty($flold)){
-                rename($flold, $flnew);
-            }
-            if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
-                $config = array();
-                $config['max_size'] = '3072';
-                $config['allowed_types'] = 'jpeg|jpg|png';
-                $config['overwrite']     = TRUE; 
-                $config['upload_path']   = './assets/upload/Olahraga/';
-                $config['file_name']     = $nm.'.png';
-                if (!file_exists($config["upload_path"])) {
-                    mkdir($config["upload_path"]);
-                }
-                $this->load->library('upload');
-                $this->upload->initialize($config);
-
-                if (!$this->upload->do_upload("foto")) {
-                    $this->_api(JSON_ERROR, "Insert Foto Gagal");
-                    exit(0);
-                }
-            }
-            $this->_api(JSON_SUCCESS, "Success Update Data");
-        } else {
-            $this->_api(JSON_ERROR, "Update Data Gagal");
-        }
+    public function saran(){
+        //$data =   $this->post('');
+        // $kal = 500;
+        // $num = "<= ".$kal;
+        // $con = array('kkal'     => $num);
+        // $data = $this->olg->get()->where('kkal', array());
+        
+        // $this->_api(JSON_SUCCESS, "Success Get Data", $data);
     }
 
     public function delete(){
-        $lokasi   = './assets/upload/Olahraga/';
-        $oldTable = $this->olg->get($this->post("id_olahraga"));
-        $delete = $this->olg->delete($this->post("id_olahraga"));
-        if ($delete) {
-            if(isset($oldTable[0])){
-                $fl = $lokasi.$oldTable[0]->nama_olahraga.'.png';
-                if (file_exists($fl)) {
-                    unlink($fl);
-                }
-            }
-            $this->_api(JSON_SUCCESS, "Success Delete Data");
-        } else {
-            $this->_api(JSON_ERROR, "Delete Data Gagal");
-        }
     }
 }
 
