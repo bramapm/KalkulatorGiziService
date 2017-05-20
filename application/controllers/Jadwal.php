@@ -1,11 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Record extends MY_Controller {
+class Jadwal extends MY_Controller {
 	
 	function __construct() {
         parent::__construct();
         $this->load->model("Table_Jadwal", "jdwl");
+        $this->load->model("Table_Olahraga", "olg");
     }
 
 	public function index()
@@ -39,7 +40,7 @@ class Record extends MY_Controller {
 	}
 
     public function insertJadwal(){
-        $kal = $this->jdwl->get($this->post('id_olahraga'), 'kkal');
+        $kal = $this->olg->get($this->post('id_olahraga'), 'kkal');
         $data = array(
         	//'id_recordolg'		=> $this->post('id_recordolg'),
         	//'id_jadwal'			=> $this->post('id_jadwal'),
@@ -52,7 +53,7 @@ class Record extends MY_Controller {
         if ($insert) {
         	$this->_api(JSON_SUCCESS, "Success Insert Data", $data);                        
         } else {
-            $this->_api(JSON_ERROR, "Insert Data Gagal");
+            $this->_api(JSON_ERROR, "Insert Data Gagal", $data);
        	}
     }    
     

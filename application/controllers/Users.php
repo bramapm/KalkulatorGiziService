@@ -106,6 +106,45 @@ class Users extends MY_Controller {
         }
 	}
 
+    public function autgoogle(){
+        $users_code =   $this->post('id_user');
+        $use = "";
+        if($users_code != ""){
+            $data = array(
+                'id_user' => $users_code
+                );
+            $use = $this->usr->get($data);
+            if (!$use) {
+                $data = array(
+                    'id_user' => $this->post('id_user'),
+                    'nama_user' => $this->post('nama_user'),
+                    'email'     => $this->post('email'),
+                    'username' => $this->post('username')
+            );
+          $users = $this->usr->get($data);
+            }
+        }
+            
+        if ($use) {
+            $this->_api(JSON_SUCCESS, "Success Login", $use);
+        }else{
+            $data = array(
+                'id_user'   => $this->post('id_user'),
+                'nama_user' => $this->post('nama_user'),
+                'email'     => $this->post('email'),
+                'username'  => $this->post('username'),
+                'status'    => "member"
+            );
+        
+            $insert = $this->usr->insert($data);
+            if ($insert) {
+                $this->_api(JSON_SUCCESS, "Success Registration", $data);
+            } else {
+                $this->_api(JSON_ERROR, "Failed Registration");
+            }
+        }
+    }
+
 	public function update_akun()
 	{
 		$users_code =   $this->post('id_user');
