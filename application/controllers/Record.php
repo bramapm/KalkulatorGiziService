@@ -45,23 +45,25 @@ class Record extends MY_Controller {
     public function get_recordMkn()
     {
         $recordCode =   $this->post('id_recordmkn');
+        $tgl        =   $this->post('tanggal');
         if ($recordCode != "") {
-            $olahraga = $this->recordMkn->get($recordCode);
+            $recMkn = $this->recordMkn->get($recordCode);
         }else{
-            $olahraga = $this->recordMkn->get();
+            $recMkn = $this->recordMkn->get();
         }
+
         $res = array();
-        foreach ($olahraga as $key) {
-            $res[] = array( 
+        foreach ($recMkn as $key) {
+            $res[] = array(
                 "id_recordmkn"      => $key->id_recordmkn,
                 "id_makanan"        => $key->id_makanan,
                 "id_user"           => $key->id_user,
                 "tanggal"           => $key->tanggal,
                 "kat_waktu"         => $key->kat_waktu,
-                "kalori"            => $key->kalori,               
+                "kalori"            => $key->kalori
             );
         }
-        $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
+        $this->_api(JSON_SUCCESS, "Success Get Data Record Makanan", $res);
     }
 
     public function insertOlg(){
