@@ -119,7 +119,7 @@ class Users extends MY_Controller {
                     'id_user' => $this->post('id_user'),
                     'nama_user' => $this->post('nama_user'),
                     'email'     => $this->post('email'),
-                    'username' => $this->post('username')
+                    'foto' => $this->post('foto')
             );
           $users = $this->usr->get($data);
             }
@@ -132,7 +132,7 @@ class Users extends MY_Controller {
                 'id_user'   => $this->post('id_user'),
                 'nama_user' => $this->post('nama_user'),
                 'email'     => $this->post('email'),
-                'username'  => $this->post('username'),
+                'foto'  => $this->post('foto'),
                 'status'    => "member"
             );
         
@@ -152,7 +152,6 @@ class Users extends MY_Controller {
 
         $data = array(
             'username'  => $this->post('username'),
-            'password'  => $this->post('password'),       
             'email'     => $this->post('email'),
             'nama_user' => $this->post('nama_user'),
             'jk'        => $this->post('jk'),
