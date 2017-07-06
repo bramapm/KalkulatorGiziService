@@ -22,18 +22,23 @@ class Jadwal extends MY_Controller {
 	public function get_jadwal(){
 		$jadwalCode =   $this->post('id_jadwal');
 		if ($jadwalCode != "") {
-            $jadwal = $this->jdwl->get($jadwalCode);
+            $jadwal = $this->jdwl->get(array(
+                    'id_jadwal'     => $jadwalCode,
+                    'id_user'       => $this->post('id_user')
+                ));
         }else{
-            $jadwal = $this->jdwl->get();
+            $jadwal = $this->jdwl->get(array(                    
+                    'id_user'       => $this->post('id_user')
+                ));
         }
         $res = array();
         foreach ($jadwal as $key) {
             $res[] = array( 
-            	"id_jadwal"		=> $key->id_recordolg,
+            	"id_jadwal"		=> $key->id_jadwal,
                 "id_user"		=> $key->id_user,
-                "id_olahraga"	=> $key->id_olahraga,                
+                "id_olahraga"	=> $key->id_olahraga,               
                 "tanggal"		=> $key->tanggal,
-                "kalori"		=> $key->kalori,               
+                "kalori"		=> $key->kalori 
             );
         }
         $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
@@ -46,8 +51,9 @@ class Jadwal extends MY_Controller {
         	//'id_jadwal'			=> $this->post('id_jadwal'),
             'id_user'			=> $this->post('id_user'),
             'tanggal'			=> $this->post('tanggal'),
-            'id_olahraga'		=> $this->post('id_olahraga'),                       
-            'kalori'			=> (is_object($kal[0])) ? $kal[0]->kkal : 0
+            'id_olahraga'		=> $this->post('id_olahraga'),
+            'kalori'            => $this->post('kalori')
+            //'kalori'			=> (is_object($kal[0])) ? $kal[0]->kkal : 0
         );
         $insert = $this->jdwl->insert($data);
         if ($insert) {

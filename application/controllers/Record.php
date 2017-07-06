@@ -36,7 +36,8 @@ class Record extends MY_Controller {
                 "id_olahraga"       => $key->id_olahraga,
                 "id_user"           => $key->id_user,
                 "tanggal"	  		=> $key->tanggal,
-                "kalori"			=> $key->kalori,               
+                "kalori"			=> $key->kalori,
+                "waktu"             => $key->waktu,
             );
         }
         $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
@@ -66,14 +67,78 @@ class Record extends MY_Controller {
         $this->_api(JSON_SUCCESS, "Success Get Data Record Makanan", $res);
     }
 
+    public function get_recordMknDay()
+    {
+        $id_user    =   $this->post('id_user');
+        $tgl        =   $this->post('tanggal');
+        $nm = $this->mkn->get($this->post('id_makanan'), 'nama_makanan');
+        if ($id_user != "") {
+            $recMkn = $this->recordMkn->get(array(
+                'id_user'   => $id_user,
+                'tanggal'   => $tgl
+                ));
+        }else{
+            $recMkn = $this->recordMkn->get();
+        }
+
+        $res = array();
+        foreach ($recMkn as $key) {            
+                $nma = $this->mkn->get($key->id_makanan, 'nama_makanan');
+            $res[] = array(                
+                "id_recordmkn"      => $key->id_recordmkn,
+                "id_makanan"        => $key->id_makanan,
+                "id_user"           => $key->id_user,
+                "tanggal"           => $key->tanggal,
+                "kat_waktu"         => $key->kat_waktu,
+                "kalori"            => $key->kalori,
+                "nama_makanan"      => (is_object($nma[0])) ? $nma[0]->nama_makanan : 0
+                //(is_object($nm[i])) ? $nm[i]->nama_makanan : 0
+            );
+        }
+        //echo $this->db->last_query();
+        $this->_api(JSON_SUCCESS, "Success Get Data Record Makanan", $res);
+    }
+
+    public function get_recordOlgDay()
+    {
+        $id_user    =   $this->post('id_user');
+        $tgl        =   $this->post('tanggal');
+        $nm = $this->olg->get($this->post('id_olahraga'), 'nama_olahraga');
+        //$km = $this->mkn->get_object($this->post('id_makanan'), 'nama_makanan');
+        if ($id_user != "") {
+            $recOlg = $this->recordOlg->get(array(
+                'id_user'   => $id_user,
+                'tanggal'   => $tgl
+                ));
+        }else{
+            $recOlg = $this->recordOlg->get();
+        }
+
+        $res = array();
+        foreach ($recOlg as $key) {
+            $res[] = array(                
+                "id_recordolg"      => $key->id_recordolg,
+                "id_olahraga"       => $key->id_olahraga,
+                "id_user"           => $key->id_user,
+                "tanggal"           => $key->tanggal,
+                "kalori"            => $key->kalori,
+                "waktu"             => $key->waktu,
+                "nama_olahraga"      => (is_object($nm[0])) ? $nm[0]->nama_olahraga : 0
+                //(is_object($nm[i])) ? $nm[i]->nama_makanan : 0
+            );
+        }
+        //echo $this->db->last_query();
+        $this->_api(JSON_SUCCESS, "Success Get Data Record Makanan", $res);
+    }
+
     public function insertOlg(){
-        $kal = $this->mkn->get($this->post('id_olahraga'), 'kkal');
         $data = array(
         	//'id_recordolg'		=> $this->post('id_recordolg'),
             'id_user'			=> $this->post('id_user'),
             'id_olahraga'		=> $this->post('id_olahraga'),                       
             'tanggal'			=> $this->post('tanggal'),
-            'kalori'			=> (is_object($kal[0])) ? $kal[0]->kkal : 0
+            'kalori'			=> $this->post('kalori'),
+            'waktu'            => $this->post('waktu')
         );
         $insert = $this->recordOlg->insert($data);
         if ($insert) {
@@ -136,8 +201,54 @@ class Record extends MY_Controller {
         $this->_api(JSON_SUCCESS, "Success Count Data", $kal);
     }
 
+    public function getMknWaktu(){
+        $waktu      =   $this->post('kat_waktu');
+        $id_user    =   $this->post('id_user');
+        $tgl        =   $this->post('tanggal');
+        
+        if ($id_user != "") {
+            $recMkn = $this->recordMkn->get(array(
+                'id_user'   => $id_user,
+                'tanggal'   => $tgl,
+                'kat_waktu' => $waktu
+                ));
+        }else{
+            $recMkn = $this->recordMkn->get();
+        }
+
+        $res = array();
+        foreach ($recMkn as $key) {            
+                $nma = $this->mkn->get($key->id_makanan, 'nama_makanan');
+            $res[] = array(                
+                "id_recordmkn"      => $key->id_recordmkn,
+                "id_makanan"        => $key->id_makanan,
+                "id_user"           => $key->id_user,
+                "tanggal"           => $key->tanggal,
+                "kat_waktu"         => $key->kat_waktu,
+                "kalori"            => $key->kalori,
+                "nama_makanan"      => (is_object($nma[0])) ? $nma[0]->nama_makanan : 0
+                //(is_object($nm[i])) ? $nm[i]->nama_makanan : 0
+            );
+        }
+        //echo $this->db->last_query();
+        $this->_api(JSON_SUCCESS, "Success Get Data Record Makanan", $res);
+        }
+    
+
     public function countKaloriMknTotal(){
         $query  = $this->recordMkn->sum('kalori', array(
+            'id_user' => $this->post('id_user'),
+            'tanggal' => $this->post('tanggal'),                        
+            ));
+        if ($query) {
+            $this->_api(JSON_SUCCESS, "Success Count Data", $query);
+        } else {
+            $this->_api(JSON_ERROR, "Failed Count Data");
+        }
+    }
+
+    public function countKaloriOlgTotal(){
+        $query  = $this->recordOlg->sum('kalori', array(
             'id_user' => $this->post('id_user'),
             'tanggal' => $this->post('tanggal'),                        
             ));

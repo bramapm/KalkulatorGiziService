@@ -68,7 +68,7 @@ class Makanan extends MY_Controller {
         );
         $where1 = $this->mkn->count(array('nama_makanan' => $this->post('nama_makanan')));
         if ($where1 > 0) {
-            $this->_api(JSON_ERROR, "Data Telah Tersedia");
+            $this->_api(JSON_ERROR, "Data Telah Tersedia", $data['nama_makanan']);
         }else{
             $insert = $this->mkn->insert($data);
             if ($insert) {
@@ -110,31 +110,38 @@ class Makanan extends MY_Controller {
 
         $update = $this->mkn->update($data, $this->post("id_makanan"));
         if ($update) {
-            if(file_exists($flold) && !empty($flold)){
-                rename($flold, $flnew);
-            }
-            if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
-                $config = array();
-                $config['max_size'] = '3072';
-                $config['allowed_types'] = 'jpeg|jpg|png';
-                $config['overwrite']     = TRUE; 
-                $config['upload_path']   = './assets/upload/Makanan/';
-                $config['file_name']     = $nm.'.png';
-                if (!file_exists($config["upload_path"])) {
-                    mkdir($config["upload_path"]);
-                }
-                $this->load->library('upload');
-                $this->upload->initialize($config);
+            $where1 = $this->mkn->count(array('nama_makanan' => $this->post('nama_makanan')));
+                if ($where1 > 0) {
+                $this->_api(JSON_ERROR, "Data Telah Tersedia", $data['nama_makanan']);
+                } else {
+                    
+                    if(file_exists($flold) && !empty($flold)){
+                        rename($flold, $flnew);
+                    }
 
-                if (!$this->upload->do_upload("foto")) {
-                    $this->_api(JSON_ERROR, "Insert Foto Gagal");
-                    exit(0);
-                }
-            }
-            $this->_api(JSON_SUCCESS, "Success Update Data");
-        } else {
+                        if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
+                            $config = array();
+                            $config['max_size'] = '3072';
+                            $config['allowed_types'] = 'jpeg|jpg|png';
+                            $config['overwrite']     = TRUE; 
+                            $config['upload_path']   = './assets/upload/Makanan/';
+                            $config['file_name']     = $nm.'.png';
+                            if (!file_exists($config["upload_path"])) {
+                                mkdir($config["upload_path"]);
+                            }
+                            $this->load->library('upload');
+                            $this->upload->initialize($config);
+
+                            if (!$this->upload->do_upload("foto")) {
+                                $this->_api(JSON_ERROR, "Insert Foto Gagal");
+                                exit(0);
+                            }
+                        }
+                        $this->_api(JSON_SUCCESS, "Success Update Data");
+                    }
+                } else {
             $this->_api(JSON_ERROR, "Update Data Gagal");
-        }
+            }
         }
 
     public function delete(){
@@ -157,7 +164,7 @@ class Makanan extends MY_Controller {
                     unlink($fl);
                 }
             }
-            $this->_api(JSON_SUCCESS, "Success Delete Data");
+            $this->_api(JSON_SUCCESS, "Success get Data");
         } else {
             $this->_api(JSON_ERROR, "Delete Data Gagal");
         }

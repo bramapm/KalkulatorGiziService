@@ -33,6 +33,7 @@ class Olahraga extends MY_Controller {
                 "nama_olahraga" 	=> $key->nama_olahraga,
                 "kkal" 				=> $key->kkal,
                 "keterangan"  		=> $key->keterangan,
+                //"foto"              => $key->foto
                 "foto" 				=> base_url().'assets/upload/Olahraga/'.$key->nama_olahraga.'.png'
             );
         }

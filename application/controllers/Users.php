@@ -26,6 +26,7 @@ class Users extends MY_Controller {
                 "username"=>$username,
                 "password"=>$password
             );
+            
             $users = $this->usr->get($data);
             if (!$users) {
                 $data = array(
@@ -35,6 +36,7 @@ class Users extends MY_Controller {
                 $users = $this->usr->get($data);
             }
         }
+
         if ($users) {
             $this->_api(JSON_SUCCESS, "Success Login", $users);
         }else{
@@ -116,10 +118,10 @@ class Users extends MY_Controller {
             $use = $this->usr->get($data);
             if (!$use) {
                 $data = array(
-                    'id_user' => $this->post('id_user'),
+                    'id_user'   => $this->post('id_user'),
                     'nama_user' => $this->post('nama_user'),
                     'email'     => $this->post('email'),
-                    'foto' => $this->post('foto')
+                    'foto'      => $this->post('foto')
             );
           $users = $this->usr->get($data);
             }
@@ -132,7 +134,7 @@ class Users extends MY_Controller {
                 'id_user'   => $this->post('id_user'),
                 'nama_user' => $this->post('nama_user'),
                 'email'     => $this->post('email'),
-                'foto'  => $this->post('foto'),
+                'foto'      => $this->post('foto'),
                 'status'    => "member"
             );
         
@@ -145,13 +147,32 @@ class Users extends MY_Controller {
         }
     }
 
-	public function update_akun()
-	{
+    public function login_web(){        
+        $users = NULL;
+        $username = $this->post("username");
+        $password = $this->post("password");
+        $ver = NULL;
+        if ($username != "" && $password != "") {
+            $data = array(
+                "username"=>$username,
+                "password"=>$password,
+                "status"=>"admin"
+            );
+            $users = $this->usr->get($data);
+        }
+
+        if ($users) {
+            $this->_api(JSON_SUCCESS, "Success Login", $users);            
+        }else{
+            $this->_api(JSON_ERROR, "Failed Login");            
+        }
+    }    
+
+	public function update_akun(){
 		$users_code =   $this->post('id_user');
         if ($users_code) {
-
         $data = array(
-            'username'  => $this->post('username'),
+            // 'username'  => $this->post('username'),
             'email'     => $this->post('email'),
             'nama_user' => $this->post('nama_user'),
             'jk'        => $this->post('jk'),
@@ -165,7 +186,23 @@ class Users extends MY_Controller {
             if ($data != NULL) {
                 $update = $this->usr->update($data, $users_code);
                 if ($update) {
-        			$this->_api(JSON_SUCCESS, "Success Update");
+                    $profile = $this->usr->get($users_code);
+                    foreach ($profile as $key) {
+                        $res = array(
+                        'id_user'   => $key->id_user,
+                        'email'     => $key->email,
+                        'nama_user' => $key->nama_user,
+                        'jk'        => $key->jk,
+                        'ttl'       => $key->ttl,
+                        'tinggi'    => $key->tinggi,
+                        'berat'     => $key->berat,
+                        'umur'      => $key->umur,
+                        'kalori'    => $key->kalori,
+                        'status'    => $key->status,
+                        'foto'      => $key->foto
+                        );
+                    }
+        			$this->_api(JSON_SUCCESS, "Success Update", $res);
                 } else {
             		$this->_api(JSON_ERROR, "Failed Update 1, check your input data");
                 }
