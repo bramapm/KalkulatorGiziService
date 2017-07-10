@@ -37,7 +37,7 @@ class Makanan extends MY_Controller {
                 "protein" 			=> $key->protein,
                 "lemak" 			=> $key->lemak,
                 "keterangan"        => $key->keterangan,
-                "foto" 				=> base_url().'assets/upload/Makanan/'.$key->nama_makanan.'.png'
+                "foto" 				=> base_url().'assets/upload/Makanan/'.str_replace(" ", "_", $key->nama_makanan).'.png'
             );
         }        
         $this->_api(JSON_SUCCESS, "Success Get Data Makanan", $res);
@@ -68,7 +68,7 @@ class Makanan extends MY_Controller {
         );
         $where1 = $this->mkn->count(array('nama_makanan' => $this->post('nama_makanan')));
         if ($where1 > 0) {
-            $this->_api(JSON_ERROR, "Data Telah Tersedia", $data['nama_makanan']);
+            $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia", $data['nama_makanan']);
         }else{
             $insert = $this->mkn->insert($data);
             if ($insert) {
@@ -112,13 +112,11 @@ class Makanan extends MY_Controller {
         if ($update) {
             $where1 = $this->mkn->count(array('nama_makanan' => $this->post('nama_makanan')));
                 if ($where1 > 0) {
-                $this->_api(JSON_ERROR, "Data Telah Tersedia", $data['nama_makanan']);
-                } else {
-                    
+                $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
+                } else {                    
                     if(file_exists($flold) && !empty($flold)){
                         rename($flold, $flnew);
                     }
-
                         if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
                             $config = array();
                             $config['max_size'] = '3072';

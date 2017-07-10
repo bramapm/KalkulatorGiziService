@@ -34,7 +34,7 @@ class Olahraga extends MY_Controller {
                 "kkal" 				=> $key->kkal,
                 "keterangan"  		=> $key->keterangan,
                 //"foto"              => $key->foto
-                "foto" 				=> base_url().'assets/upload/Olahraga/'.$key->nama_olahraga.'.png'
+                "foto" 				=> base_url().'assets/upload/Olahraga/'.str_replace(" ", "_", $key->nama_olahraga).'.png'
             );
         }
         $this->_api(JSON_SUCCESS, "Success Get Data Olahraga", $res);
@@ -60,7 +60,7 @@ class Olahraga extends MY_Controller {
         );
         $where1 = $this->olg->count(array('nama_olahraga' => $this->post('nama_olahraga')));
         if ($where1 > 0) {
-            $this->_api(JSON_ERROR, "Data Telah Tersedia");
+            $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
         }else{
             $insert = $this->olg->insert($data);
             if ($insert) {
@@ -80,13 +80,12 @@ class Olahraga extends MY_Controller {
 
     public function update(){
         $nm = $this->post('nama_olahraga');
-
         $lokasi   = './assets/upload/Olahraga/';
 
-        $nama = $this->olg->get($this->post("id_olahraga"));
+        $baris = $this->olg->get($this->post("id_olahraga"));
         $flold = "";
-        if(isset($nama[0])){
-            $flold = $lokasi.$nama[0]->nama_olahraga.'.png';
+        if(isset($baris[0])){
+            $flold = $lokasi.$baris[0]->nama_olahraga.'.png';
         }
         $flnew = $lokasi.$nm.'.png';
 
@@ -96,6 +95,10 @@ class Olahraga extends MY_Controller {
             'keterangan'        => $this->post('keterangan'),          
         );
 
+        $where1 = $this->olg->count(array('nama_olahraga' => $this->post('nama_olahraga')));
+        if ($where1 > 0) {
+            $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
+        }else{
         $update = $this->olg->update($data, $this->post("id_olahraga"));
         if ($update) {
             if(file_exists($flold) && !empty($flold)){
@@ -122,6 +125,7 @@ class Olahraga extends MY_Controller {
             $this->_api(JSON_SUCCESS, "Success Update Data");
         } else {
             $this->_api(JSON_ERROR, "Update Data Gagal");
+            }
         }
     }
 
