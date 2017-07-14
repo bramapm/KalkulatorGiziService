@@ -83,7 +83,7 @@ class Record extends MY_Controller {
 
         $res = array();
         foreach ($recMkn as $key) {            
-                $nma = $this->mkn->get($key->id_makanan, 'nama_makanan');
+            $nma = $this->mkn->get($key->id_makanan, 'nama_makanan');
             $res[] = array(                
                 "id_recordmkn"      => $key->id_recordmkn,
                 "id_makanan"        => $key->id_makanan,

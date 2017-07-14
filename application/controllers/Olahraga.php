@@ -80,26 +80,38 @@ class Olahraga extends MY_Controller {
 
     public function update(){
         $nm = $this->post('nama_olahraga');
+
         $lokasi   = './assets/upload/Olahraga/';
 
-        $baris = $this->olg->get($this->post("id_olahraga"));
+        $nama = $this->olg->get($this->post("id_olahraga"));
         $flold = "";
-        if(isset($baris[0])){
-            $flold = $lokasi.$baris[0]->nama_olahraga.'.png';
+        if(isset($nama[0])){
+            $flold = $lokasi.$nama[0]->nama_olahraga.'.png';
         }
         $flnew = $lokasi.$nm.'.png';
 
-        $data = array(            
-            'nama_olahraga'     => $this->post('nama_olahraga'),
+        $data = array(                        
+            //'nama_olahraga'     => $this->post('nama_olahraga'),
             'kkal'              => $this->post('kkal'),
-            'keterangan'        => $this->post('keterangan'),          
+            'keterangan'        => $this->post('keterangan'),
         );
-
-        $where1 = $this->olg->count(array('nama_olahraga' => $this->post('nama_olahraga')));
-        if ($where1 > 0) {
-            $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
+        $is_same = FALSE;
+        if(!empty($nm)){
+            $is_same = TRUE;
         }else{
-        $update = $this->olg->update($data, $this->post("id_olahraga"));
+            $is_same = FALSE;
+        }
+        if($is_same){
+            $data["nama_olahraga"] = $nm;
+            $where1 = $this->olg->count(array('nama_olahraga' => $this->post('nama_olahraga')));
+            if ($where1 > 0) {
+                $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
+                exit(0);
+            }else{
+                $is_same = FALSE;
+            }
+        }
+        $update = $this->olg->update($data, $this->post("id_olahraga"));            
         if ($update) {
             if(file_exists($flold) && !empty($flold)){
                 rename($flold, $flnew);
@@ -123,9 +135,8 @@ class Olahraga extends MY_Controller {
                 }
             }
             $this->_api(JSON_SUCCESS, "Success Update Data");
-        } else {
+        }else{
             $this->_api(JSON_ERROR, "Update Data Gagal");
-            }
         }
     }
 

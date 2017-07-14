@@ -99,7 +99,6 @@ class Makanan extends MY_Controller {
         $flnew = $lokasi.$nm.'.png';
 
         $data = array(                        
-            'nama_makanan'      => $this->post('nama_makanan'),
             'jenis'             => $this->post('jenis'),
             'kkal'              => $this->post('kkal'),
             'karbo'             => $this->post('karbo'),
@@ -107,40 +106,50 @@ class Makanan extends MY_Controller {
             'lemak'             => $this->post('lemak'),            
             'keterangan'        => $this->post('keterangan'),
         );
-
-        $update = $this->mkn->update($data, $this->post("id_makanan"));
-        if ($update) {
+        $is_same = FALSE;
+        if(!empty($nm)){
+            $is_same = TRUE;
+        }else{
+            $is_same = FALSE;
+        }
+        if($is_same){
+            $data["nama_makanan"] = $nm;
             $where1 = $this->mkn->count(array('nama_makanan' => $this->post('nama_makanan')));
-                if ($where1 > 0) {
+            if ($where1 > 0) {
                 $this->_api(JSON_ERROR, "Data ".$nm." Telah Tersedia");
-                } else {                    
-                    if(file_exists($flold) && !empty($flold)){
-                        rename($flold, $flnew);
-                    }
-                        if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
-                            $config = array();
-                            $config['max_size'] = '3072';
-                            $config['allowed_types'] = 'jpeg|jpg|png';
-                            $config['overwrite']     = TRUE; 
-                            $config['upload_path']   = './assets/upload/Makanan/';
-                            $config['file_name']     = $nm.'.png';
-                            if (!file_exists($config["upload_path"])) {
-                                mkdir($config["upload_path"]);
-                            }
-                            $this->load->library('upload');
-                            $this->upload->initialize($config);
-
-                            if (!$this->upload->do_upload("foto")) {
-                                $this->_api(JSON_ERROR, "Insert Foto Gagal");
-                                exit(0);
-                            }
-                        }
-                        $this->_api(JSON_SUCCESS, "Success Update Data");
-                    }
-                } else {
-            $this->_api(JSON_ERROR, "Update Data Gagal");
+                exit(0);
+            }else{
+                $is_same = FALSE;
             }
         }
+        $update = $this->mkn->update($data, $this->post("id_makanan"));            
+        if ($update) {
+            if(file_exists($flold) && !empty($flold)){
+                rename($flold, $flnew);
+            }
+            if (isset($_FILES["foto"]) && $_FILES["foto"] != NULL) {
+                $config = array();
+                $config['max_size'] = '3072';
+                $config['allowed_types'] = 'jpeg|jpg|png';
+                $config['overwrite']     = TRUE; 
+                $config['upload_path']   = './assets/upload/Makanan/';
+                $config['file_name']     = $nm.'.png';
+                if (!file_exists($config["upload_path"])) {
+                    mkdir($config["upload_path"]);
+                }
+                $this->load->library('upload');
+                $this->upload->initialize($config);
+
+                if (!$this->upload->do_upload("foto")) {
+                    $this->_api(JSON_ERROR, "Insert Foto Gagal");
+                    exit(0);
+                }
+            }
+            $this->_api(JSON_SUCCESS, "Success Update Data");
+        }else{
+            $this->_api(JSON_ERROR, "Update Data Gagal");
+        }
+    }
 
     public function delete(){
         $delete = $this->mkn->delete($this->post("id_makanan"));

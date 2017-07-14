@@ -33,12 +33,16 @@ class Jadwal extends MY_Controller {
         }
         $res = array();
         foreach ($jadwal as $key) {
+            $nama = $this->olg->get($key->id_olahraga, 'nama_olahraga');
+            $kkal = $this->olg->get($key->id_olahraga, 'kkal');
             $res[] = array( 
             	"id_jadwal"		=> $key->id_jadwal,
                 "id_user"		=> $key->id_user,
                 "id_olahraga"	=> $key->id_olahraga,               
                 "tanggal"		=> $key->tanggal,
-                "kalori"		=> $key->kalori 
+                "kalori"		=> $key->kalori,
+                "nama_olahraga" => (is_object($nama[0])) ? $nama[0]->nama_olahraga : 0,
+                "kal_olahraga"  => (is_object($kkal[0])) ? $kkal[0]->kkal : 0
             );
         }
         $this->_api(JSON_SUCCESS, "Success Get Data Record Olahraga", $res);
